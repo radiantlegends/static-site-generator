@@ -11,10 +11,6 @@ class TestHTMLNode(unittest.TestCase):
             HTMLNode("a", "This is a link.", None, {"href": "https://www.boot.dev/"})
         ]
 
-        for node in nodes:
-            print(node.__repr__())
-            print(node.props_to_html())
-
         self.assertEqual(nodes[0], nodes[0])
         self.assertNotEqual(nodes[0], nodes[1])
         self.assertNotEqual(nodes[2], nodes[3])
