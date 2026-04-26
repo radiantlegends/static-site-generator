@@ -1,6 +1,7 @@
 import unittest
-from textnode import TextNode, TextType
-from splitnodes import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
+from src.text_node import TextNode, TextType
+from src.split_nodes import split_nodes_delimiter, split_nodes_image, split_nodes_link, text_to_textnodes, extract_markdown_images, extract_markdown_links
+from src.block_parser import markdown_to_blocks
 
 class TestSplitNodesDelimiter(unittest.TestCase):
     def test_split_node_bold(self):
@@ -257,6 +258,67 @@ class TestTextToTextNode(unittest.TestCase):
                 TextNode(" and a ", TextType.TEXT),
                 TextNode("link", TextType.LINK, "https://boot.dev"),
             ]
+        )
+
+class TestMarkdownToBlocks(unittest.TestCase):
+    def test_markdown_to_blocks(self):
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+
+    def test_empty_string(self):
+        md = ""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            []
+        )
+    
+    def test_single_block(self):
+        md = "This is a single paragraph."
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            ["This is a single paragraph."]
+        )
+
+    def test_multiple_blank_lines(self):
+        md = """
+This test includes excessive amounts of blank spaces.
+
+
+
+See? That's a lot of space.
+
+
+
+
+- There's more above this list!
+- Why so many?!
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This test includes excessive amounts of blank spaces.",
+                "See? That's a lot of space.",
+                "- There's more above this list!\n- Why so many?!",
+            ],
         )
 
 if __name__ == "main":
