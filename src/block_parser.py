@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 
 class BlockType(Enum):
@@ -13,16 +14,15 @@ def markdown_to_blocks(markdown):
     return [block.strip() for block in blocks if block.strip()]
 
 def block_to_block_type(block):
-    if(block.startswith("#")):
+    if(re.match(r"^#{1,6}\s.+", block)):
         return BlockType.HEADING
+    elif(re.match(r"\`{3}\n(?:.|\n)*?\`{3}", block)):
+        return BlockType.CODE
+    elif(re.match(r"^(?:>.+\n?)+", block)):
+        return BlockType.QUOTE
+    elif(re.match(r"^(?:-.+\n?)+", block)):
+        return BlockType.UNORDERED_LIST
+    elif(re.match(r"^(?:\d\.\s+.+)(?:\n\d+\.\s+.+)*", block)):
+        return BlockType.ORDERED_LIST
     else:
         return BlockType.PARAGRAPH
-
-'''
-Headings start with 1-6 # characters, followed by a space and then the heading text.
-Multiline Code blocks must start with 3 backticks and a newline, then end with 3 backticks.
-Every line in a quote block must start with a "greater-than" character: > followed by the quote text. A space after > is allowed but not required.
-Every line in an unordered list block must start with a - character, followed by a space.
-Every line in an ordered list block must start with a number followed by a . character and a space. The number must start at 1 and increment by 1 for each line.
-If none of the above conditions are met, the block is a normal paragraph.
-'''

@@ -67,5 +67,44 @@ class TestBlockToBlockType(unittest.TestCase):
         md = "# This is a heading"
         blocks = markdown_to_blocks(md)
         block_type = block_to_block_type(blocks[0])
-        print(block_type)
         self.assertEqual(block_type, BlockType.HEADING)
+
+    def test_block_to_code(self):
+        md = '''
+        ```
+        This is a code block.
+        ```
+        '''
+        blocks = markdown_to_blocks(md)
+        block_type = block_to_block_type(blocks[0])
+        self.assertEqual(block_type, BlockType.CODE)
+
+    def test_block_to_quote(self):
+        md = "> This is a quote."
+        blocks = markdown_to_blocks(md)
+        block_type = block_to_block_type(blocks[0])
+        self.assertEqual(block_type, BlockType.QUOTE)
+    
+    def test_block_to_unordered_list(self):
+        md = '''
+        - This is an unordered list.
+        - There's even two items!
+        '''
+        blocks = markdown_to_blocks(md)
+        block_type = block_to_block_type(blocks[0])
+        self.assertEqual(block_type, BlockType.UNORDERED_LIST)
+
+    def test_block_to_ordered_list(self):
+        md = '''
+        1. This is an ordered list.
+        2. With two items!
+        '''
+        blocks = markdown_to_blocks(md)
+        block_type = block_to_block_type(blocks[0])
+        self.assertEqual(block_type, BlockType.ORDERED_LIST)
+
+    def test_block_to_paragraph(self):
+        md = "This is a regular sentence."
+        blocks = markdown_to_blocks(md)
+        block_type = block_to_block_type(blocks[0])
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
