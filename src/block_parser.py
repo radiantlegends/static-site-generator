@@ -1,5 +1,7 @@
 import re
 from enum import Enum
+from html_node import HTMLNode, LeafNode, ParentNode
+from text_node import TextNode, TextType, text_node_to_html_node
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -26,3 +28,28 @@ def block_to_block_type(block):
         return BlockType.ORDERED_LIST
     else:
         return BlockType.PARAGRAPH
+
+def block_to_html_node(block, block_type):
+    match block_type:
+        case BlockType.PARAGRAPH:
+            return LeafNode("p", block)
+        case BlockType.HEADING:
+            return LeafNode("h1", block[2:])
+
+
+def markdown_to_html_node(markdown):
+    blocks = markdown_to_blocks(markdown)
+    print(f"Blocks: {blocks}")
+    html_nodes = []
+    for block in blocks:
+        print("------------------------------")
+        print(f"Block: {block}")
+        block_type = block_to_block_type(block)
+        print(f"Block Type: {block_type}")
+        node = block_to_html_node(block, block_type)
+        print(node)
+        html_nodes.append(node)
+    print(f"HTML Nodes: {html_nodes}")
+    return ParentNode("div", html_nodes)
+
+markdown_to_html_node("# H1 Header")

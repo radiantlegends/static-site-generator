@@ -1,5 +1,6 @@
 import unittest
-from src.block_parser import markdown_to_blocks, block_to_block_type, BlockType
+from src.block_parser import markdown_to_blocks, block_to_block_type, BlockType, markdown_to_html_node
+from src.text_node import TextNode, TextType, text_node_to_html_node
 
 class TestMarkdownToBlocks(unittest.TestCase):
     def test_markdown_to_blocks(self):
@@ -70,11 +71,11 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(block_type, BlockType.HEADING)
 
     def test_block_to_code(self):
-        md = '''
+        md = """
         ```
         This is a code block.
         ```
-        '''
+        """
         blocks = markdown_to_blocks(md)
         block_type = block_to_block_type(blocks[0])
         self.assertEqual(block_type, BlockType.CODE)
@@ -86,19 +87,19 @@ class TestBlockToBlockType(unittest.TestCase):
         self.assertEqual(block_type, BlockType.QUOTE)
     
     def test_block_to_unordered_list(self):
-        md = '''
+        md = """
         - This is an unordered list.
         - There's even two items!
-        '''
+        """
         blocks = markdown_to_blocks(md)
         block_type = block_to_block_type(blocks[0])
         self.assertEqual(block_type, BlockType.UNORDERED_LIST)
 
     def test_block_to_ordered_list(self):
-        md = '''
+        md = """
         1. This is an ordered list.
         2. With two items!
-        '''
+        """
         blocks = markdown_to_blocks(md)
         block_type = block_to_block_type(blocks[0])
         self.assertEqual(block_type, BlockType.ORDERED_LIST)
@@ -108,3 +109,24 @@ class TestBlockToBlockType(unittest.TestCase):
         blocks = markdown_to_blocks(md)
         block_type = block_to_block_type(blocks[0])
         self.assertEqual(block_type, BlockType.PARAGRAPH)
+    
+
+class test_markdown_to_html_node(unittest.TestCase):
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+        """
+
+    def test_headings(self):
+        md = "# H1 Header"
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><h1>H1 Header</h1></div>"
+        )
