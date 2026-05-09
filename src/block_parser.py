@@ -1,8 +1,8 @@
 import re
 from enum import Enum
-from html_node import HTMLNode, LeafNode, ParentNode
-from text_node import TextNode, TextType, text_node_to_html_node
-from split_nodes import text_to_textnodes, split_nodes_delimiter
+from src.html_node import HTMLNode, LeafNode, ParentNode
+from src.text_node import TextNode, TextType, text_node_to_html_node
+from src.split_nodes import text_to_textnodes, split_nodes_delimiter
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
@@ -52,50 +52,37 @@ def block_to_html_node(block, block_type):
         case BlockType.CODE:
             match = re.match(r"\`{3}(?:\n)?(.*?)\`{3}", block, re.DOTALL)
             if(match):
-                code_text = match.group(1).rstrip("\n")
+                code_text = match.group(1)
             else:
                 code_text = block
             return ParentNode("pre", [ParentNode("code", [LeafNode(None, code_text)])])
+        case BlockType.QUOTE:
+            quote_lines = [re.sub(r"^>\s?", "", line).strip() for line in block.splitlines()]
+            quote_text = " ".join(line for line in quote_lines)
+            children = text_to_children(quote_text)
+            return ParentNode("blockquote", children)
+        case BlockType.UNORDERED_LIST:
+            items = [re.sub(r"^-\s+", "", line).strip() for line in block.splitlines()]
+            list_items = []
+            for item in items:
+                children = text_to_children(item)
+                list_items.append(ParentNode("li", children))
+            return ParentNode("ul", list_items)
+        case BlockType.ORDERED_LIST:
+            items = [re.sub(r"^\d+\.\s+", "", line).strip() for line in block.splitlines()]
+            list_items = []
+            for item in items:
+                children = text_to_children(item)
+                list_items.append(ParentNode("li", children))
+            return ParentNode("ol", list_items)
+        case _:
+            raise Exception("Invalid Block Type: Unable to create HTML node.")
 
 def markdown_to_html_node(markdown):
     blocks = markdown_to_blocks(markdown)
-    print(f"Blocks: {blocks}")
     html_nodes = []
     for block in blocks:
-        print("------------------------------")
-        print(f"Block: {block}")
         block_type = block_to_block_type(block)
-        print(f"Block Type: {block_type}")
         node = block_to_html_node(block, block_type)
-        print(node)
         html_nodes.append(node)
-    print(f"HTML Nodes: {html_nodes}")
     return ParentNode("div", html_nodes)
-
-md_paragraph = """
-This is **bolded** paragraph
-text in a p
-tag here
-
-This is another paragraph with _italic_ text and `code` here
-
-"""
-
-md_heading = """
-# H1 Header
-## H2 Header
-### H3 Header
-#### H4 Header
-##### H5 Header
-###### H6 Header
-"""
-
-md_code = """
-```
-This is a code block. **Bold** and _italic_ show as plain text.
-```
-"""
-
-node = markdown_to_html_node(md_code)
-html = node.to_html()
-print(html)

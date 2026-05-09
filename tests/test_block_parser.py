@@ -143,10 +143,36 @@ This is another paragraph with _italic_ text and `code` here
 This is text that _should_ remain
 the **same** even with inline stuff
 ```
-"""
+        """
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
+    
+    def test_quotes(self):
+        md = """
+> This is a quote that _should_ create
+> one simple **blockquote** with the
+>appropriate formatting.
+        """
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><blockquote>This is a quote that <i>should</i> create one simple <b>blockquote</b> with the appropriate formatting.</blockquote></div>"
+        )
+    
+    def test_unordered_list(self):
+        md = """
+- First item in the list.
+- Second **bold** item in the list.
+- Third <q>inline quote</q> in the list.
+        """
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><ul><li>First item in the list.</li><li>Second <b>bold</b> item in the list.</li><li>Third <q>inline quote</q> in the list.</li></ul></div>"
         )
