@@ -1,8 +1,8 @@
 import re
 from enum import Enum
-from src.html_node import HTMLNode, LeafNode, ParentNode
-from src.text_node import TextNode, TextType, text_node_to_html_node
-from src.split_nodes import text_to_textnodes, split_nodes_delimiter
+from html_node import HTMLNode, LeafNode, ParentNode
+from text_node import TextNode, TextType, text_node_to_html_node
+from split_nodes import text_to_textnodes, split_nodes_delimiter
 
 class BlockType(Enum):
     PARAGRAPH = "paragraph"

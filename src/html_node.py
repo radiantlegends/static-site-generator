@@ -22,14 +22,20 @@ class HTMLNode:
 
 
 class LeafNode(HTMLNode):
+    SELF_CLOSING_TAGS = {'img', 'br', 'hr', 'input', 'meta', 'link'}
+    
     def __init__(self, tag, value, props=None):
         super().__init__(tag=tag, value=value, props=props)
     
     def to_html(self):
-        if not self.value:
-            raise ValueError("All leaf nodes must have a value.")
         if not self.tag:
+            if not self.value:
+                raise ValueError("Text nodes must have a value.")
             return self.value
+        if self.tag in self.SELF_CLOSING_TAGS:
+            return f"<{self.tag}{self.props_to_html()} />"
+        if not self.value:
+            raise ValueError(f"Leaf nodes must have a value.\n{self}")
         return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
     
     def __repr__(self):
